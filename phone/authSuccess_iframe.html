@@ -11,8 +11,24 @@
 Congratulations, enjoy free wifi.
 <button onclick="sendMessageToParent('logout')">logout</button>
 <script>
+    function getParentURLFromIFrame(){
+        let isSameDomain = (window.location === window.parent.location);
+        try {
+            isSameDomain = window.parent.location && 
+                window.parent.location.host === window.location.host; // cross domain error
+        } catch (error) {
+            console.log('[sso] give up detect same origin domain');
+        }
+
+        const parentUrl = isSameDomain
+                ? (window.location.protocol + '//' + window.location.host)
+                : document.referrer;
+        // const parentUrl
+        console.log('[sso] parent url is ', parentUrl,  ' is same domain=', isSameDomain, window.location.href);
+        return parentUrl;
+    }
     function sendMessageToParent(eventType) {
-        window.parent.postMessage({event: eventType});
+        window.parent.postMessage({event: eventType}, getParentURLFromIFrame());
         console.log("sendMessageToParent...", eventType);
     }
 </script>
